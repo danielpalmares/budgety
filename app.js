@@ -268,7 +268,8 @@ var UIController = (function () {
         current.value = "";
       });
 
-      fieldsArr[0].focus();
+      // fieldsArr[0].focus();
+      document.querySelector(DOMstrings.inputType).focus()
     },
 
     displayBudget: function (obj) {
