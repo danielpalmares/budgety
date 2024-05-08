@@ -19,6 +19,17 @@ var budgetController = (function () {
     return this.percentage;
   };
 
+  var setInitialState = function () {
+    var parsed = JSON.parse(localStorage.getItem('state')) ?? data;
+
+    if (parsed.allItems.exp.length > 0) {
+      parsed.allItems.exp = parsed.allItems.exp.map(e => new Expense(e.id, e.description, e.value))
+    }
+
+    data = parsed
+    return parsed
+  };
+
   var Income = function (id, description, value) {
     this.id = id;
     this.description = description;
@@ -71,6 +82,8 @@ var budgetController = (function () {
       // Push it into our data structure
       data.allItems[type].push(newItem);
 
+      localStorage.setItem('state', JSON.stringify(data))
+
       // Return the new element
       return newItem;
     },
@@ -92,6 +105,8 @@ var budgetController = (function () {
       if (index !== -1) {
         data.allItems[type].splice(index, 1);
       }
+
+      localStorage.setItem('state', JSON.stringify(data))
     },
 
     calculateBudget: function () {
@@ -108,6 +123,8 @@ var budgetController = (function () {
       } else {
         data.percentage = -1;
       }
+
+      localStorage.setItem('state', JSON.stringify(data))
 
       // Expense = 100 and income 300, spent 33.333% = 100/300 = 0.3333 * 100
     },
@@ -144,9 +161,8 @@ var budgetController = (function () {
       };
     },
 
-    testing: function () {
-      console.log(data);
-    },
+    setInitialState,
+    Expense,
   };
 })();
 
@@ -342,6 +358,11 @@ var UIController = (function () {
 
 // GLOBAL APP CONTROLLER
 var controller = (function (budgetCtrl, UICtrl) {
+  var setInit = function () {
+    var state = budgetCtrl.setInitialState();
+    return state
+  }
+  
   var setupEventListeners = function () {
     var DOM = UICtrl.getDOMstrings();
 
@@ -436,13 +457,21 @@ var controller = (function (budgetCtrl, UICtrl) {
   return {
     init: function () {
       console.log("Application has started.");
+      var state = setInit()
       UICtrl.displayMonth();
       UICtrl.displayBudget({
-        budget: 0,
-        totalInc: 0,
-        totalExp: 0,
-        percentage: -1,
+        budget: state.budget,
+        totalInc: state.totals.inc,
+        totalExp: state.totals.exp,
+        percentage: state.percentage,
       });
+      state.allItems.exp.forEach(item => {
+        return UICtrl.addListItem(item, 'exp')
+      });
+      state.allItems.inc.forEach(item => {
+        return UICtrl.addListItem(item, 'inc')
+      });
+      updatePercentages()
       setupEventListeners();
     },
   };
