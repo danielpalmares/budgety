@@ -32,20 +32,17 @@ body {
 **********************************************/
 
 .top {
-    height: 40vh;
+    width: 100vw;
     background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(back.png);
     background-size: cover;
     background-position: center;
-    position: relative;
+    padding: 40px;
 }
 
 .budget {
-    position: absolute;
     width: 350px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     color: #fff;
+    margin: 0 auto;
 }
 
 .budget__title {
